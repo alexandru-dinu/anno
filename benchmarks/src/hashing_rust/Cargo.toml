@@ -1,5 +1,5 @@
 [package]
-name = "sha256_rust"
+name = "hashing_rust"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 sha256 = "1.1.1"
+blake3 = "1.3.1"
