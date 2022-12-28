@@ -28,3 +28,25 @@ pub fn hash_from_path(path: &str) -> String {
 
     hash
 }
+
+mod tests {
+    #[test]
+    fn test_hash_from_path() {
+        let files = vec!["/usr/bin/ls", "/usr/bin/vi"];
+
+        for file in files {
+            let src_hash = super::hash_from_path(file);
+            let tgt_hash = std::process::Command::new("sha256sum")
+                .arg(file)
+                .output()
+                .expect("Could not run sha256sum")
+                .stdout
+                .split(|&x| x == b' ')
+                .next()
+                .unwrap()
+                .to_vec();
+
+            assert_eq!(src_hash, String::from_utf8(tgt_hash).unwrap());
+        }
+    }
+}

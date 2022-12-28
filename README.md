@@ -1,4 +1,7 @@
 # `anno`
+
+[![Build](https://github.com/alexandru-dinu/anno/actions/workflows/build.yml/badge.svg)](https://github.com/alexandru-dinu/anno/actions/workflows/build.yml)
+
 Annotate (binary) files with useful metadata.
 
 ## Usage
