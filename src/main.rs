@@ -1,42 +1,17 @@
 use clap::{arg, command};
 use serde_json;
-use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::Read;
 use std::process::{exit, Command};
 
-// const ANNO_DIR: &str = concat!(env!("HOME"), "/.anno");
-const ANNO_DIR: &str = "/tmp/anno";
-const BUFFER_SIZE: usize = 4096;
+mod config;
+mod hashing;
 
-fn hash_from_path(path: &str) -> String {
-    // TODO: is it optimal to return a String here?
-    let mut hasher = Sha256::new();
-
-    let mut file = File::open(path).expect("Could not open file");
-    let mut buffer = [0; BUFFER_SIZE];
-
-    loop {
-        let count = file.read(&mut buffer).expect("Could not read from file");
-        if count == 0 {
-            break;
-        }
-        hasher.update(&buffer[..count]);
-    }
-
-    let result = hasher.finalize();
-
-    let mut hash = String::new();
-    for byte in result {
-        hash.push_str(&format!("{:02x}", byte));
-    }
-
-    hash
-}
+use hashing::hash_from_path;
 
 fn read_path(path: &str) {
     let hash = hash_from_path(path);
-    let anno_path = format!("{}/{}", ANNO_DIR, hash);
+    let anno_path = format!("{}/{}", config::ANNO_DIR, hash);
 
     let mut file = match File::open(&anno_path) {
         Ok(file) => file,
@@ -57,10 +32,9 @@ fn read_path(path: &str) {
 
 fn write_path(path: &str) {
     let hash = hash_from_path(path);
-    let anno_path = format!("{}/{}", ANNO_DIR, hash);
+    let anno_path = format!("{}/{}", config::ANNO_DIR, hash);
 
-    let editor = std::env::var("EDITOR").unwrap_or_else(|_| "vim".to_string());
-    let status = Command::new(editor)
+    let status = Command::new(config::get_editor())
         .arg(anno_path)
         .status()
         .expect("Could not open editor");
