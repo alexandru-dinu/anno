@@ -10,8 +10,8 @@ Annotate (binary) files with useful metadata.
 Usage: anno [OPTIONS]
 
 Options:
-  -r, --read <VALUE>   Read anno.
-  -w, --write <VALUE>  Write anno.
-  -h, --help           Print help information
-  -V, --version        Print version information
+  -r, --read <FILE>   Read anno for given file.
+  -w, --write <FILE>  Write anno for given file.
+  -h, --help          Print help information
+  -V, --version       Print version information
 ```

@@ -1,22 +1,35 @@
 use clap::{arg, command};
-use serde_json;
+use lazy_static::lazy_static;
+use serde_json::{Map, Value};
 use std::fs::File;
 use std::io::Read;
 use std::process::{exit, Command};
 
-mod config;
 mod hashing;
 
 use hashing::hash_from_path;
 
-fn read_path(path: &str) {
-    let hash = hash_from_path(path);
-    let anno_path = format!("{}/{}", config::ANNO_DIR, hash);
+struct Config {
+    anno_dir: String,
+    editor: String,
+}
 
-    let mut file = match File::open(&anno_path) {
+lazy_static! {
+    static ref CONFIG: Config = {
+        let cfg = parse_json("config.json");
+        Config { // TODO: parse directly into struct?
+            anno_dir: cfg.get("anno_dir").unwrap().as_str().unwrap().to_string(),
+            editor: cfg.get("editor").unwrap().as_str().unwrap().to_string(),
+        }
+    };
+}
+
+fn parse_json(path: &str) -> Map<String, Value> {
+    // TODO: return dict
+    let mut file = match File::open(path) {
         Ok(file) => file,
         Err(e) => {
-            eprintln!("{}: {}", e, &anno_path);
+            eprintln!("{}: {}", e, path);
             exit(-1);
         }
     };
@@ -24,17 +37,28 @@ fn read_path(path: &str) {
     let mut contents = String::new();
     file.read_to_string(&mut contents)
         .expect("Could not read file");
-    let json: serde_json::Value = serde_json::from_str(&contents).expect("Could not parse json");
-    for (key, value) in json.as_object().unwrap() {
+
+    let json: Value = serde_json::from_str(&contents).expect("Could not parse json");
+
+    json.as_object().unwrap().clone()
+}
+
+fn read_path(path: &str) {
+    let hash = hash_from_path(path);
+    let anno_path = format!("{}/{}", CONFIG.anno_dir, hash);
+
+    let json = parse_json(&anno_path);
+
+    for (key, value) in json {
         println!("{}: {}", key, value);
     }
 }
 
 fn write_path(path: &str) {
     let hash = hash_from_path(path);
-    let anno_path = format!("{}/{}", config::ANNO_DIR, hash);
+    let anno_path = format!("{}/{}", CONFIG.anno_dir, hash);
 
-    let status = Command::new(config::get_editor())
+    let status = Command::new(&CONFIG.editor)
         .arg(anno_path)
         .status()
         .expect("Could not open editor");
@@ -50,12 +74,12 @@ fn write_path(path: &str) {
 fn main() {
     let matches = command!()
         .arg(
-            arg!(-r --read <VALUE> "Read anno.")
+            arg!(-r --read <FILE> "Read anno for given file")
                 .required_unless_present("write")
                 .conflicts_with("write"),
         )
         .arg(
-            arg!(-w --write <VALUE> "Write anno.")
+            arg!(-w --write <FILE> "Write anno for given file")
                 .required_unless_present("read")
                 .conflicts_with("read"),
         )
