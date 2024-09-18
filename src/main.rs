@@ -24,19 +24,26 @@ lazy_static! {
     };
 }
 
-fn parse_json(path: &str) -> Map<String, Value> {
-    // TODO: return dict
+fn read_to_string(path: &str) -> String {
     let mut file = match File::open(path) {
         Ok(file) => file,
         Err(e) => {
             eprintln!("{}: {}", e, path);
-            exit(-1);
+            exit(1);
         }
     };
 
     let mut contents = String::new();
+
     file.read_to_string(&mut contents)
         .expect("Could not read file");
+
+    contents
+}
+
+fn parse_json(path: &str) -> Map<String, Value> {
+    // TODO: return dict
+    let contents = read_to_string(path);
 
     let json: Value = serde_json::from_str(&contents).expect("Could not parse json");
 
@@ -47,11 +54,7 @@ fn read_path(path: &str) {
     let hash = hash_from_path(path);
     let anno_path = format!("{}/{}", CONFIG.anno_dir, hash);
 
-    let json = parse_json(&anno_path);
-
-    for (key, value) in json {
-        println!("{}: {}", key, value);
-    }
+    println!("{}", read_to_string(&anno_path));
 }
 
 fn write_path(path: &str) {
@@ -65,10 +68,8 @@ fn write_path(path: &str) {
 
     if !status.success() {
         eprintln!("Editor exited with non-zero status");
-        exit(-1);
+        exit(1);
     }
-
-    println!("ALL GOOD!");
 }
 
 fn main() {

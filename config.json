@@ -1,4 +1,4 @@
 {
-    "anno_dir": "/tmp/anno",
-    "editor": "vim"
+    "anno_dir": "./txt",
+    "editor": "nvim"
 }

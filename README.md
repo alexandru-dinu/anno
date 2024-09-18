@@ -4,7 +4,7 @@
 
 Annotate (binary) files with useful metadata.
 
-## Motivation
+# Motivation
 
 When working with lots of heterogeneous (binary) files, it is important to maintain a high-level description of the contents, so that you can immediately understand what's inside, without having to open or explore the data.
 
@@ -39,23 +39,23 @@ $ getfattr -n description foo.bin
 foo.bin: description: Operation not supported
 ```
 
-## Solution
+# Solution
 
-`anno` tries to offer sensible solution to this problem by maintaining a mapping from a UID (unique ID, e.g. hash / checksum) of the input file to its metadata, so you can easily move / copy the data without having to worry about breaking the metadata.
+`anno` tries to offer a sensible solution to this problem by maintaining a mapping from a unique identifier (e.g. hash / checksum) of the input file to its metadata, so you can easily move / copy the data without having to worry about breaking the metadata.
 
 `anno` uses a root dir (e.g. `~/.local/share/anno-dir`) inside which it stores metadata as JSON files named by the file's UID.
 For example, if you have a file with a UID `1234abcd`, its metadata will be stored to `~/.local/share/anno-dir/1234abcd`.
 
-The current UID implementation uses SHA256.
+The current unique identifier is SHA256.
 
-## Usage
+# Usage
 
 ```
 Usage: anno [OPTIONS]
 
 Options:
-  -r, --read <FILE>   Read anno for given file.
-  -w, --write <FILE>  Write anno for given file.
-  -h, --help          Print help information
-  -V, --version       Print version information
+  -r, --read <FILE>   Read anno for given file
+  -w, --write <FILE>  Write anno for given file
+  -h, --help          Print help
+  -V, --version       Print version
 ```
