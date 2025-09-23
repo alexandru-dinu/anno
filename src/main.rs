@@ -1,5 +1,5 @@
 use clap::{arg, command};
-use dirs::data_dir;
+use dirs::home_dir;
 use std::env;
 use std::fs;
 use std::fs::File;
@@ -18,7 +18,7 @@ struct Config {
 
 impl Config {
     fn from_env() -> Config {
-        let default_anno_dir = data_dir().unwrap().join("anno");
+        let default_anno_dir: PathBuf = home_dir().unwrap().join(".local/share/anno");
         let anno_dir = env::var("ANNO_DIR").map_or(default_anno_dir, PathBuf::from);
         let editor = env::var("EDITOR").unwrap_or_else(|_| "nano".to_string());
 
